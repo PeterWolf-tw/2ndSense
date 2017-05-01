@@ -38,7 +38,6 @@ class MainWindow(QtGui.QWidget):
         upperLeftFrame = QtGui.QFrame()
         upperLeftFrame.setFrameShape(QtGui.QFrame.StyledPanel)
         upperLeftFrame.setFixedSize(self.dropZoneWidth, self.dropZoneHeight)
-        #upperLeftFrame.setMinimumSize(self.dropZoneWidth, self.dropZoneHeight)
 
         lowerLeftFrame = QtGui.QFrame()
         lowerLeftFrame.setFrameShape(QtGui.QFrame.StyledPanel)
@@ -61,15 +60,18 @@ class MainWindow(QtGui.QWidget):
         upperLeftVBox.setContentsMargins(0, 0, 0, 0)
         lowerLeftVBox.setContentsMargins(0, 0, 0, 0)
 
+        # <內容>
         upperLeftLabel = QtGui.QLabel(upperLeftFrame)
         upperLeftLabel.setText(">Drop Zone<")
         upperLeftLabel.setAlignment(QtCore.Qt.AlignCenter)
         upperLeftLabel.setFixedSize(self.dropZoneWidth, self.dropZoneHeight)
         upperLeftVBox.addWidget(upperLeftLabel)
 
-        lowerLeftButton = QtGui.QPushButton(lowerLeftFrame)
-        lowerLeftButton.setText("I am on the lower left box, which in the lower frame.")
-        lowerLeftVBox.addWidget(lowerLeftButton)
+        lowerLeftTable = QtGui.QTableWidget(lowerLeftFrame)
+        lowerLeftLable = QtGui.QLabel()
+        lowerLeftLable.setText("File List:")
+        lowerLeftVBox.addWidget(lowerLeftLable)
+        lowerLeftVBox.addWidget(lowerLeftTable)
 
         upperRightButton = QtGui.QPushButton(upperRightFrame)
         upperRightButton.setText("RIGHT TOP")
@@ -78,6 +80,7 @@ class MainWindow(QtGui.QWidget):
         lowerRightButton = QtGui.QPushButton(lowerRightFrame)
         lowerRightButton.setText("RIGHT TOP")
         lowerRightVBox.addWidget(lowerRightButton)
+        # </內容>
 
         upperLeftFrame.setLayout(upperLeftVBox)
         lowerLeftFrame.setLayout(lowerLeftVBox)
