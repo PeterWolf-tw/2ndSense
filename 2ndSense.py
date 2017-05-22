@@ -34,11 +34,10 @@ class TableWidgetItem(QtGui.QTableWidgetItem):
         return self.sortKey < other.sortKey
 
 
-
 class DropZoneLabel(QtGui.QLabel):
     def __init__(self):
         super(DropZoneLabel, self).__init__()
-
+        self.setToolTip("Drag & Drop files to add to the 'File list' below!")
         self.setAcceptDrops(True)
 
     def dragEnterEvent(self, e):
@@ -47,20 +46,18 @@ class DropZoneLabel(QtGui.QLabel):
             e.accept()
         else:
             e.ignore()
-        #if e.mimeData().hasFormat('text/plain'):
-            #e.accept()
-        #else:
-            #e.ignore()
 
     def dropEvent(self, e):
         print("dropping at", e.mimeData())
         if e.mimeData().hasUrls:
             fileLIST = []
+            fileDICT = {}
             for url in e.mimeData().urls():
                 path = url.toLocalFile()
                 if os.path.isfile(path):
                     fileLIST.append(path)
             print(fileLIST)
+
             return fileLIST
         else:
             return None
@@ -69,9 +66,13 @@ class FileListTable(QtGui.QTableWidget):
     def __init__(self):
         super(FileListTable, self).__init__()
         self.fileLIST = []
+        self.fileDICT = {}
+        self.toolTip = "Drag&Drop files here!"
+        self.currentHoverLIST = [0, 0]
         self.setAcceptDrops(True)
         self.verticalHeader().setVisible(False)
         self.horizontalHeader().setVisible(False)
+        self.setShowGrid(False)
 
     def dragEnterEvent(self, e):
         print("fileLIST dragging enter")
@@ -93,7 +94,8 @@ class FileListTable(QtGui.QTableWidget):
             for url in e.mimeData().urls():
                 path = url.toLocalFile()
                 if os.path.isfile(path):
-                    self.fileLIST.append([path])
+                    self.fileDICT[str(len(self.fileLIST)+1)] = {"fullPath": path, "fileObj":None} #filePath 用於讀取檔案； fileObj 用於記錄該檔案是否已開啟。若已實體化並開啟，就不會是 None
+                    self.fileLIST.append([str(len(self.fileLIST)+1), os.path.basename(path)])
             self.fileListSetter(self.fileLIST)
         else:
             return None
@@ -107,14 +109,21 @@ class FileListTable(QtGui.QTableWidget):
         for i, row in enumerate(sorted(fileLIST)):
             for j, col in enumerate(row):
                 item = TableWidgetItem(col, col)
+                item.setToolTip(self.fileDICT[str(i+1)]["fullPath"])
                 self.setItem(i, j, item)
+        self.setEditTriggers(QtGui.QAbstractItemView.NoEditTriggers)
         self.setSortingEnabled(True)
+        self.hideColumn(0) #隱藏 self.fileDICT 的 key 值
         self.resizeColumnsToContents()
-        #for f in fileLIST:
-            #self.setItem(0, 0, f)
+        return None
 
-
-
+    def rowHover(self, row, column):
+        currentItem  = self.item(row, column)
+        previousItem = self.item(self.currentHoverLIST[0], self.currentHoverLIST[1])
+        if self.currentHoverLIST == [row, column]:
+            pass
+        else:
+            currentItem.showhint
 
 class MainWindow(QtGui.QWidget):
     def __init__(self):
