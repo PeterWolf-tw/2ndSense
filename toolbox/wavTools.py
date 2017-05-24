@@ -37,7 +37,7 @@ class WavGear:
         return self.wavDataDICT
 
     def _signalNormalizer(self, signalARY, ceilling=0.95):
-        avg = numpy.mean(signal)
+        avg = numpy.mean(signalARY)
         wavSignalARY = signalARY - avg
         normalizedSignalARY = numpy.int16(wavSignalARY/numpy.max(numpy.abs(wavSignalARY)*1.0)*32767*ceilling)
         return normalizedSignalARY
