@@ -4,6 +4,7 @@
 
 import numpy
 import wave
+import struct
 
 class WavGear:
     def __init__(self):
