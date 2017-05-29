@@ -28,9 +28,9 @@ class TableWidgetItem(QtGui.QTableWidgetItem):
     def __lt__(self, other):
         return self.sortKey < other.sortKey
 
-class FileListTable(QtGui.QTableWidget):
+class FileListQTableWidget(QtGui.QTableWidget):
     def __init__(self):
-        super(FileListTable, self).__init__()
+        super(FileListQTableWidget, self).__init__()
         self.fileLIST = []
         self.fileDICT = {}
         self.toolTip = "Drag&Drop files here!"
@@ -92,9 +92,9 @@ class FileListTable(QtGui.QTableWidget):
             currentItem.showhint
 
 
-class FileList(QtGui.QListWidget):
+class FileListQListWidget(QtGui.QListWidget):
     def __init__(self):
-        super(FileList, self).__init__()
+        super(FileListQListWidget, self).__init__()
         self.fileLIST = []
         self.fileDICT = {}
         self.toolTip = "Drag&Drop files here!"
