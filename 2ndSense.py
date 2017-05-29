@@ -18,7 +18,6 @@ import sys
 
 from PySide import QtCore
 from PySide import QtGui
-from UI.fileManager import FileListQTableWidget
 from UI.fileManager import FileListQListWidget
 from UI.ctrlButtons import DropZoneLabel
 from UI.plotZone import waveformGraph
@@ -75,15 +74,8 @@ class MainWindow(QtGui.QWidget):
         lowerLeftLable = QtGui.QLabel()
         lowerLeftLable.setText("File List:")
         lowerLeftVBox.addWidget(lowerLeftLable)
-        #lowerLeftTable = QtGui.QTableWidget(lowerLeftFrame)
-        #lowerLeftTable = FileListTable() #QtGui.QTableWidget(lowerLeftFrame)
         lowerLeftTable = FileListQListWidget()
-        #lowerLeftTable.setItem()
         lowerLeftVBox.addWidget(lowerLeftTable)
-
-        #upperRightButton = QtGui.QPushButton(upperRightFrame)
-        #upperRightButton.setText("RIGHT TOP")
-        #upperRightVBox.addWidget(upperRightButton)
 
         upperRightZone = waveformGraph()
         upperRightVBox.addWidget(upperRightZone)
@@ -119,28 +111,12 @@ class MainWindow(QtGui.QWidget):
 
         return None
 
-    #def dragEnterEvent(self, e):
-        #print("dragging enter")
-        #if e.mimeData().hasUrls:
-            #e.accept()
-        #else:
-            #e.ignore()
-
     def dragMoveEvent(self, e):
         print("dragging move")
         if e.mimeData().hasUrls:
             e.accept()
         else:
             e.ignore()
-
-    #def dropEvent(self, e):
-        #print("dropping at", e.mimeData())
-        ##print((10, 10) < e.pos())
-        ##if (10, 10) < e.pos() < (self.dropZoneWidth, self.dropZoneHeight):
-            ##print("Inside drop zone")
-        #if e.mimeData().hasUrls:
-            #print(e.mimeData().urls())
-        #return None
 
 
 def main():
