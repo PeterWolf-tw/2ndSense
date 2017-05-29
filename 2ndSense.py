@@ -18,8 +18,8 @@ import sys
 
 from PySide import QtCore
 from PySide import QtGui
-from UI.fileManager import FileListTable
-#from UI.fileManager import FileList
+from UI.fileManager import FileListQTableWidget
+from UI.fileManager import FileListQListWidget
 from UI.ctrlButtons import DropZoneLabel
 from UI.plotZone import waveformGraph
 
@@ -76,8 +76,8 @@ class MainWindow(QtGui.QWidget):
         lowerLeftLable.setText("File List:")
         lowerLeftVBox.addWidget(lowerLeftLable)
         #lowerLeftTable = QtGui.QTableWidget(lowerLeftFrame)
-        lowerLeftTable = FileListTable() #QtGui.QTableWidget(lowerLeftFrame)
-        #lowerLeftTable = FileList()
+        #lowerLeftTable = FileListTable() #QtGui.QTableWidget(lowerLeftFrame)
+        lowerLeftTable = FileListQListWidget()
         #lowerLeftTable.setItem()
         lowerLeftVBox.addWidget(lowerLeftTable)
 
