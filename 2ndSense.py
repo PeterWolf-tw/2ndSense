@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 # -*- coding:utf-8 -*-
 # FileName: 2ndSense.py
 # Development starting date: 2016.10.20
@@ -19,7 +19,9 @@ import sys
 from PySide import QtCore
 from PySide import QtGui
 from UI.fileManager import FileListTable
+#from UI.fileManager import FileList
 from UI.ctrlButtons import DropZoneLabel
+from UI.plotZone import waveformGraph
 
 
 class MainWindow(QtGui.QWidget):
@@ -75,12 +77,16 @@ class MainWindow(QtGui.QWidget):
         lowerLeftVBox.addWidget(lowerLeftLable)
         #lowerLeftTable = QtGui.QTableWidget(lowerLeftFrame)
         lowerLeftTable = FileListTable() #QtGui.QTableWidget(lowerLeftFrame)
+        #lowerLeftTable = FileList()
         #lowerLeftTable.setItem()
         lowerLeftVBox.addWidget(lowerLeftTable)
 
-        upperRightButton = QtGui.QPushButton(upperRightFrame)
-        upperRightButton.setText("RIGHT TOP")
-        upperRightVBox.addWidget(upperRightButton)
+        #upperRightButton = QtGui.QPushButton(upperRightFrame)
+        #upperRightButton.setText("RIGHT TOP")
+        #upperRightVBox.addWidget(upperRightButton)
+
+        upperRightZone = waveformGraph()
+        upperRightVBox.addWidget(upperRightZone)
 
         lowerRightButton = QtGui.QPushButton(lowerRightFrame)
         lowerRightButton.setText("RIGHT Lower")

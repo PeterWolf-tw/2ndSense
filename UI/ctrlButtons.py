@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 # FileName:ctrlButtons.py
 
-# Developer: Peter. w (peterwolf.wang@gmail.com)
+# Developer: Peter. w (peter.w@droidtown.co)
 # This Software/Scipt is protected by copyright and other
 # intellectual property laws and treaties.
 # Droidtown Linguistic Technology Co., Ltd. owns the copyright,

@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 # FileName: fileManager.py
 
-# Developer: Peter. w (peterwolf.wang@gmail.com)
+# Developer: Peter. w (peter.w@droidtown.co)
 # This Software/Scipt is protected by copyright and other
 # intellectual property laws and treaties.
 # Droidtown Linguistic Technology Co., Ltd. owns the copyright,
@@ -81,6 +81,68 @@ class FileListTable(QtGui.QTableWidget):
         self.setSortingEnabled(True)
         self.hideColumn(0) #隱藏 self.fileDICT 的 key 值
         self.resizeColumnsToContents()
+        return None
+
+    def rowHover(self, row, column):
+        currentItem  = self.item(row, column)
+        previousItem = self.item(self.currentHoverLIST[0], self.currentHoverLIST[1])
+        if self.currentHoverLIST == [row, column]:
+            pass
+        else:
+            currentItem.showhint
+
+
+class FileList(QtGui.QListWidget):
+    def __init__(self):
+        super(FileList, self).__init__()
+        self.fileLIST = []
+        self.fileDICT = {}
+        self.toolTip = "Drag&Drop files here!"
+        self.currentHoverLIST = [0, 0]
+        self.setAcceptDrops(True)
+
+    def dragEnterEvent(self, e):
+        print("fileLIST dragging enter")
+        if e.mimeData().hasUrls:
+            e.accept()
+        else:
+            e.ignore()
+        #if e.mimeData().hasFormat('text/plain'):
+            #e.accept()
+        #else:
+            #e.ignore()
+
+    def dragMoveEvent(self, e):
+        e.accept()
+
+    def dropEvent(self, e):
+        print("fileLIST dropping at", e.mimeData())
+        if e.mimeData().hasUrls:
+            for url in e.mimeData().urls():
+                path = url.toLocalFile()
+                if os.path.isfile(path):
+                    self.fileDICT[str(len(self.fileLIST)+1)] = {"fullPath": path, "fileObj":None} #filePath 用於讀取檔案； fileObj 用於記錄該檔案是否已開啟。若已實體化並開啟，就不會是 None
+                    self.fileLIST.append([str(len(self.fileLIST)+1), os.path.basename(path)])
+            self.fileListSetter(self.fileLIST)
+        else:
+            return None
+
+    def fileListSetter(self, fileLIST):
+        print("fileLIST:", fileLIST)
+        self.insertItem(QtGui.QListWidgetItem(self.fileLIST))
+        #self.insertRow(len(fileLIST))
+        #self.setRowCount(len(self.fileLIST))
+        #self.setColumnCount(len(self.fileLIST[0]))
+        #self.setSortingEnabled(False)
+        #for i, row in enumerate(sorted(fileLIST)):
+            #for j, col in enumerate(row):
+                #item = TableWidgetItem(col, col)
+                #item.setToolTip(self.fileDICT[str(i+1)]["fullPath"])
+                #self.setItem(i, j, item)
+        #self.setEditTriggers(QtGui.QAbstractItemView.NoEditTriggers)
+        #self.setSortingEnabled(True)
+        #self.hideColumn(0) #隱藏 self.fileDICT 的 key 值
+        #self.resizeColumnsToContents()
         return None
 
     def rowHover(self, row, column):
