@@ -19,14 +19,14 @@ import sys
 from PySide import QtCore
 from PySide import QtGui
 from UI.fileManager import FileListQListWidget
-from UI.ctrlButtons import DropZoneLabel
+from UI.ctrlButtons import DropZoneFrame
 from UI.plotZone import waveformGraph
 
 
 class MainWindow(QtGui.QWidget):
     def __init__(self):
         super(MainWindow, self).__init__()
-        self.dropZoneWidth = 120
+        self.dropZoneWidth = 142
         self.dropZoneHeight = self.dropZoneWidth
         self.fileListWidth = self.dropZoneWidth
         self.initUI()
@@ -37,16 +37,16 @@ class MainWindow(QtGui.QWidget):
         extRightFrame = QtGui.QFrame()
         leftVBox = QtGui.QVBoxLayout(extLeftFrame)
         rightVBox = QtGui.QVBoxLayout(extRightFrame)
-        extLeftFrame.setMaximumWidth(self.dropZoneWidth+10)
+        extLeftFrame.setMaximumWidth(self.dropZoneWidth+5)
 
-        upperLeftFrame = QtGui.QFrame()
+        upperLeftFrame = DropZoneFrame()
         upperLeftFrame.setFrameShape(QtGui.QFrame.StyledPanel)
         upperLeftFrame.setFixedSize(self.dropZoneWidth, self.dropZoneHeight)
 
         lowerLeftFrame = QtGui.QFrame()
         lowerLeftFrame.setFrameShape(QtGui.QFrame.StyledPanel)
         lowerLeftFrame.setFixedWidth(self.fileListWidth)
-        lowerLeftFrame.setMinimumWidth(self.dropZoneWidth)
+        lowerLeftFrame.setMinimumWidth(self.dropZoneWidth-5)
 
         upperRightFrame = QtGui.QFrame()
         upperRightFrame.setFrameShape(QtGui.QFrame.StyledPanel)
@@ -64,13 +64,6 @@ class MainWindow(QtGui.QWidget):
         upperLeftVBox.setContentsMargins(0, 0, 0, 0)
         lowerLeftVBox.setContentsMargins(0, 0, 0, 0)
 
-        # <內容>
-        upperLeftLabel = DropZoneLabel() #QtGui.QLabel(upperLeftFrame)
-        upperLeftLabel.setText(">Drop Zone<")
-        upperLeftLabel.setAlignment(QtCore.Qt.AlignCenter)
-        upperLeftLabel.setFixedSize(self.dropZoneWidth, self.dropZoneHeight)
-        upperLeftVBox.addWidget(upperLeftLabel)
-
         lowerLeftLable = QtGui.QLabel()
         lowerLeftLable.setText("File List:")
         lowerLeftVBox.addWidget(lowerLeftLable)
@@ -83,7 +76,7 @@ class MainWindow(QtGui.QWidget):
         lowerRightButton = QtGui.QPushButton(lowerRightFrame)
         lowerRightButton.setText("RIGHT Lower")
         lowerRightVBox.addWidget(lowerRightButton)
-        # </內容>
+
 
         upperLeftFrame.setLayout(upperLeftVBox)
         lowerLeftFrame.setLayout(lowerLeftVBox)
@@ -99,12 +92,7 @@ class MainWindow(QtGui.QWidget):
         extHBox.addWidget(extRightFrame)
         self.setLayout(extHBox)
 
-        #screenSize = QtGui.QDesktopWidget().screenGeometry()
-
-        #self.setGeometry(screenSize)
-        self.setFixedSize(1046, 550)
-        #self.setAcceptDrops(True)
-        extRightFrame.setAcceptDrops(False)
+        #extRightFrame.setAcceptDrops(False)
 
 
         self.show()

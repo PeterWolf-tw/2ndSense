@@ -14,6 +14,7 @@
 import os
 
 from PySide import QtGui
+from PySide import QtCore
 
 
 class TableWidgetItem(QtGui.QTableWidgetItem):
@@ -126,9 +127,13 @@ class FileListQListWidget(QtGui.QListWidget):
 
     def fileListSetter(self, fileLIST):
         print("fileLIST:", fileLIST)
-        self.addItems(self.fileLIST)
-        for i in range(0, len(self.fileLIST)):
-            self.setToolTip(self.fileDICT[str(i+1)]["fullPath"])
+
+        self.clear()
+        for i in range(0, len(fileLIST)):
+            newItem = QtGui.QListWidgetItem(fileLIST[i])
+            newItem.setData(QtCore.Qt.ToolTipRole, self.fileDICT[str(i+1)]["fullPath"])
+            self.addItem(newItem)
+
         return None
 
     def rowHover(self, row, column):
