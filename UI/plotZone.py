@@ -11,22 +11,126 @@
 # Copyright 2016 Droidtown Ling. Tech. Co., Ltd
 # All Rights Reserved.
 
-import PySide
+from PySide import QtCore
+from PySide import QtGui
 import pyqtgraph as pqg
+import weakref
+import weakref
+import sys
+from copy import deepcopy
+import numpy as np
 
-class waveformGraph(pqg.PlotWidget):
+class CustomViewBox(pqg.ViewBox):
+    def __init__(self, *args, **kwds):
+        pqg.ViewBox.__init__(self, *args, **kwds)
+        self.setMouseMode(self.RectMode)
+
+    ## reimplement right-click to zoom out
+    def mouseClickEvent(self, ev):
+        if ev.button() == QtCore.Qt.RightButton:
+            self.autoRange()
+
+    def mouseDragEvent(self, ev):
+        if ev.button() == QtCore.Qt.RightButton:
+            ev.ignore()
+        else:
+            pqg.ViewBox.mouseDragEvent(self, ev)
+
+class WaveformGraph(pqg.PlotWidget):
     def __init__(self):
-        super(waveformGraph, self).__init__()
+        super(WaveformGraph, self).__init__()
+        cvb = CustomViewBox()
+        self.ViewBox = cvb
         self.setYRange(-1, 1, padding=0.05)
-        #self.wheelEvent(self, ev, y)
+        self.setLimits(yMin=-1, yMax=1, xMin=0)
+        pqg.setConfigOptions(antialias=True)
+        #self.setMouseE
         self.data = []
+        self.setLabel('left', 'amp')
+        self.setLabel('bottom', 'Time', units='Sec.')
         return None
 
     def plotter(data):
         p = self.PlotItem.plot(data)
 
+    #def wheelEvent(self, axis=None):
+        ## 1. Pass on the wheelevent to the superclass, such
+        ##    that the standard zoomoperation can be executed.
+        #pqg.PlotWidget.wheelEvent(ev,axis)
 
-    def wheelEvent(self, ev, axis=None):
-        # 1. Pass on the wheelevent to the superclass, such
-        #    that the standard zoomoperation can be executed.
-        pqg.PlotWidget.wheelEvent(ev,axis)
+
+class SpectrogramWidget(pqg.PlotWidget):
+    #read_collected = QtCore.Signal(np.ndarray)
+    def __init__(self):
+        super(SpectrogramWidget, self).__init__()
+        cvb = CustomViewBox()
+        self.ViewBox=cvb
+        self.setYRange(0, 10000)
+        self.setLimits(yMin=0)
+
+        self.img = pqg.ImageItem()
+        self.addItem(self.img)
+        FS = 44100 #Hz
+        CHUNKSZ = 1024 #samples
+        self.img_array = np.zeros((1000, CHUNKSZ/2+1))
+
+        # bipolar colormap
+
+        pos = np.array([0., 1., 0.5, 0.25, 0.75])
+        color = np.array([[0,255,255,255], [255,255,0,255], [0,0,0,255], (0, 0, 255, 255), (255, 0, 0, 255)], dtype=np.ubyte)
+        cmap = pqg.ColorMap(pos, color)
+        lut = cmap.getLookupTable(0.0, 1.0, 256)
+
+        self.img.setLookupTable(lut)
+        self.img.setLevels([-50,40])
+
+        freq = np.arange((CHUNKSZ/2)+1)/(float(CHUNKSZ)/FS)
+        yscale = 1.0/(self.img_array.shape[1]/freq[-1])
+        self.img.scale((1./FS)*CHUNKSZ, yscale)
+
+        self.setLabel('left', 'Frequency', units='Hz')
+        self.setLabel('bottom', 'Time', units='Sec.')
+
+        self.win = np.hanning(CHUNKSZ)
+        self.show()
+
+    def update(self, chunk):
+        # normalized, windowed frequencies in data chunk
+
+        spec = np.fft.rfft(chunk*self.win) / CHUNKSZ
+        # get magnitude
+
+        psd = abs(spec)
+        # convert to dB scale
+
+        psd = 20 * np.log10(psd)
+
+        # roll down one and replace leading edge with new data
+
+        self.img_array = np.roll(self.img_array, -1, 0)
+        self.img_array[-1:] = psd
+
+        self.img.setImage(self.img_array, autoLevels=False)
+
+class ComboWidget(QtGui.QWidget):
+    def __init__(self):
+        super(ComboWidget, self).__init__()
+        self.hBox = QtGui.QHBoxLayout()
+
+        self.vBox = QtGui.QVBoxLayout()
+        waveformZone = WaveformGraph()
+        spectrogramZone = SpectrogramWidget()
+        self.setContentsMargins(0, 0, 0, 0)
+
+        waveformZone.setXLink(spectrogramZone)
+
+        self.vBox.addWidget(waveformZone)
+        self.vBox.addWidget(spectrogramZone)
+
+
+        self.gBox = QtGui.QGridLayout()
+        #self.gBox.addWidget()
+
+
+        self.setLayout(self.vBox)
+        return None
