@@ -18,6 +18,7 @@ class WavGear:
                             "env"              : None,
                             }
 
+
     def wavReader(self, wavFileName):
         self.wavFileName = wavFileName
 

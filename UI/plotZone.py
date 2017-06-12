@@ -11,13 +11,13 @@
 # Copyright 2016 Droidtown Ling. Tech. Co., Ltd
 # All Rights Reserved.
 
+import inspect
+import os
+
 from PySide import QtCore
 from PySide import QtGui
 import pyqtgraph as pqg
-import weakref
-import weakref
 import sys
-from copy import deepcopy
 import numpy as np
 
 class CustomViewBox(pqg.ViewBox):
@@ -115,22 +115,47 @@ class SpectrogramWidget(pqg.PlotWidget):
 class ComboWidget(QtGui.QWidget):
     def __init__(self):
         super(ComboWidget, self).__init__()
+
+        #<嚐試使用自動載入按鈕>
+        try:
+            moduleLIST = [m for m in os.listdir("./toolbox") if m.endswith("Tools.py")]
+        except:
+            moduleLIST = []
+        for m in moduleLIST:
+            mObj = __import__("toolbox."+m.replace(".py", ""))
+            current_module = sys.modules[mObj.__name__]
+            print("modules:", current_module)
+        print("moduleLIST:", moduleLIST)
+        #toolLIST = ["test1", "test2"]
+        toolLIST = [m[:-3].upper().replace("TOOLS", " tools") for m in moduleLIST]
+        toolCombobox = pqg.ComboBox(items=toolLIST)
+
+
+        #</嚐試使用自動載入按鈕>
+
         self.hBox = QtGui.QHBoxLayout()
 
         self.vBox = QtGui.QVBoxLayout()
         waveformZone = WaveformGraph()
         spectrogramZone = SpectrogramWidget()
-        self.setContentsMargins(0, 0, 0, 0)
+        self.setContentsMargins(-10, -10, -10, -5)
 
         waveformZone.setXLink(spectrogramZone)
 
         self.vBox.addWidget(waveformZone)
         self.vBox.addWidget(spectrogramZone)
 
-
         self.gBox = QtGui.QGridLayout()
+        self.gBox.setAlignment(QtCore.Qt.Alignment(QtCore.Qt.AlignTop))
+        self.gBox.addWidget(QtGui.QLabel("Toolbox"))
+        self.gBox.addWidget(toolCombobox)
+
+        self.hBox.addLayout(self.vBox)
+        self.hBox.addLayout(self.gBox)
+
+
         #self.gBox.addWidget()
 
-
-        self.setLayout(self.vBox)
+        self.setLayout(self.hBox)
+        #self.setLayout(self.vBox)
         return None

@@ -20,7 +20,9 @@ from PySide import QtCore
 from PySide import QtGui
 from UI.fileManager import FileListQListWidget
 from UI.ctrlButtons import DropZoneFrame
-from UI.plotZone import waveformGraph
+#from UI.plotZone import WaveformGraph
+#from UI.plotZone import SpectrogramWidget
+from UI.plotZone import ComboWidget
 
 
 class MainWindow(QtGui.QWidget):
@@ -70,8 +72,13 @@ class MainWindow(QtGui.QWidget):
         lowerLeftTable = FileListQListWidget()
         lowerLeftVBox.addWidget(lowerLeftTable)
 
-        upperRightZone = waveformGraph()
-        upperRightVBox.addWidget(upperRightZone)
+        #upperRightWaveZone = WaveformGraph()
+        #upperRightVBox.addWidget(upperRightWaveZone)
+        #upperRightSpectrogramZone = SpectrogramWidget()
+        #upperRightVBox.addWidget(upperRightSpectrogramZone)
+
+        comboZone = ComboWidget()
+        upperRightVBox.addWidget(comboZone)
 
         lowerRightButton = QtGui.QPushButton(lowerRightFrame)
         lowerRightButton.setText("RIGHT Lower")
@@ -93,7 +100,6 @@ class MainWindow(QtGui.QWidget):
         self.setLayout(extHBox)
 
         #extRightFrame.setAcceptDrops(False)
-
 
         self.show()
 

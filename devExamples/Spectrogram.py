@@ -54,6 +54,7 @@ class SpectrogramWidget(pg.PlotWidget):
         self.img.scale((1./FS)*CHUNKSZ, yscale)
 
         self.setLabel('left', 'Frequency', units='Hz')
+        self.setLabel('bottom', 'Time', units='Sec.')
 
         self.win = np.hanning(CHUNKSZ)
         self.show()
