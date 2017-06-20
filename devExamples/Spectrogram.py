@@ -30,7 +30,7 @@ class MicrophoneRecorder():
         self.p.terminate()
 
 class SpectrogramWidget(pg.PlotWidget):
-    read_collected = QtCore.Signal(np.ndarray)
+    read_collected =  pg.QtCore.Signal(np.ndarray)
     def __init__(self):
         super(SpectrogramWidget, self).__init__()
 
@@ -87,7 +87,7 @@ if __name__ == '__main__':
     # time (seconds) between reads
 
     interval = FS/CHUNKSZ
-    t = QtCore.QTimer()
+    t = pg.QtCore.QTimer()
     t.timeout.connect(mic.read)
     t.start(1000/interval) #QTimer takes ms
 

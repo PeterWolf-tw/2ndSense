@@ -25,7 +25,7 @@ from UI.ctrlButtons import DropZoneFrame
 from UI.plotZone import ComboWidget
 
 
-class MainWindow(QtGui.QWidget):
+class MainWindow(QtGui.QWidget): #繼承QtGui.QWidget這個class
     def __init__(self):
         super(MainWindow, self).__init__()
         self.dropZoneWidth = 142
@@ -114,7 +114,7 @@ class MainWindow(QtGui.QWidget):
 
 
 def main():
-    app = QtGui.QApplication(sys.argv)
+    app = QtGui.QApplication(sys.argv) #initialize the QT application
     window = MainWindow()
     sys.exit(app.exec_())
 
