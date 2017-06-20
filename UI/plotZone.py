@@ -97,7 +97,7 @@ class SpectrogramWidget(pqg.PlotWidget):
 
     def update(self, chunk):
         # normalized, windowed frequencies in data chunk
-        CHUNKSZ = 1024  # samples
+
         spec = np.fft.rfft(chunk*self.win) / CHUNKSZ
         # get magnitude
 

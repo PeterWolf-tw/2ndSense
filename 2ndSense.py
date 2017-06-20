@@ -20,12 +20,10 @@ from PySide import QtCore
 from PySide import QtGui
 from UI.fileManager import FileListQListWidget
 from UI.ctrlButtons import DropZoneFrame
-#from UI.plotZone import WaveformGraph
-#from UI.plotZone import SpectrogramWidget
 from UI.plotZone import ComboWidget
 
 
-class MainWindow(QtGui.QWidget): #繼承QtGui.QWidget這個class
+class MainWindow(QtGui.QWidget):
     def __init__(self):
         super(MainWindow, self).__init__()
         self.dropZoneWidth = 142
@@ -72,11 +70,6 @@ class MainWindow(QtGui.QWidget): #繼承QtGui.QWidget這個class
         lowerLeftTable = FileListQListWidget()
         lowerLeftVBox.addWidget(lowerLeftTable)
 
-        #upperRightWaveZone = WaveformGraph()
-        #upperRightVBox.addWidget(upperRightWaveZone)
-        #upperRightSpectrogramZone = SpectrogramWidget()
-        #upperRightVBox.addWidget(upperRightSpectrogramZone)
-
         comboZone = ComboWidget()
         upperRightVBox.addWidget(comboZone)
 
@@ -114,7 +107,7 @@ class MainWindow(QtGui.QWidget): #繼承QtGui.QWidget這個class
 
 
 def main():
-    app = QtGui.QApplication(sys.argv) #initialize the QT application
+    app = QtGui.QApplication(sys.argv)
     window = MainWindow()
     sys.exit(app.exec_())
 
