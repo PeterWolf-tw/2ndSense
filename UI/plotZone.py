@@ -11,6 +11,7 @@
 # Copyright 2016 Droidtown Ling. Tech. Co., Ltd
 # All Rights Reserved.
 
+import importlib
 import inspect
 import os
 
@@ -121,11 +122,23 @@ class ComboWidget(QtGui.QWidget):
             moduleLIST = [m for m in os.listdir("./toolbox") if m.endswith("Tools.py")]
         except:
             moduleLIST = []
+
+        toolDICT = {}
+
         for m in moduleLIST:
-            mObj = __import__("toolbox."+m.replace(".py", ""))
-            current_module = sys.modules[mObj.__name__]
-            print("modules:", current_module)
-        print("moduleLIST:", moduleLIST)
+            module = importlib.import_module("toolbox."+m.replace(".py", ""))
+            for name, obj in inspect.getmembers(module, inspect.isclass):
+                toolDICT[name] = [f for f in obj.__dict__.keys() if f.startswith("_") == False]
+                print("toolDICT:", toolDICT, "toolbox."+m.replace(".py", ".")+toolDICT[name][0])
+                mObj = importlib.import_module("toolbox."+m.replace(".py", ""))
+                mFuncLIST = [f for f in inspect.getmembers(mObj) if inspect.ismodule(f[1])]
+                print("functions:", mFuncLIST)
+
+
+            #mObj = __import__("toolbox."+m.replace(".py", ""))
+            #current_module = sys.modules[mObj.__name__]
+            #print("modules:", current_module)
+        #print("moduleLIST:", moduleLIST)
         #toolLIST = ["test1", "test2"]
         toolLIST = [m[:-3].upper().replace("TOOLS", " tools") for m in moduleLIST]
         toolCombobox = pqg.ComboBox(items=toolLIST)
