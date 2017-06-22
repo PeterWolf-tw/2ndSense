@@ -14,12 +14,35 @@
 import importlib
 import inspect
 import os
-
+import pyaudio
 from PySide import QtCore
 from PySide import QtGui
 import pyqtgraph as pqg
 import sys
 import numpy as np
+
+class MicrophoneRecorder():
+    def __init__(self, signal):
+        self.FS = 44100
+        self.CHUNKSZ = 1024
+        self.signal = signal
+        self.p = pyaudio.PyAudio()
+        self.stream = self.p.open(format=pyaudio.paInt16,
+                                  channels=1,
+                                  rate=self.FS,
+                                  input=True,
+                                  frames_per_buffer=self.CHUNKSZ)
+
+    def read(self):
+        data = self.stream.read(CHUNKSZ)
+        y = np.fromstring(data, 'int16')
+        self.signal.emit(y)
+
+    def close(self):
+        self.stream.stop_stream()
+        self.stream.close()
+        self.p.terminate()
+
 
 class CustomViewBox(pqg.ViewBox):
     def __init__(self, *args, **kwds):
@@ -61,7 +84,7 @@ class WaveformGraph(pqg.PlotWidget):
 
 
 class SpectrogramWidget(pqg.PlotWidget):
-    #read_collected = QtCore.Signal(np.ndarray)
+    read_collected = QtCore.Signal(np.ndarray)
     def __init__(self):
         super(SpectrogramWidget, self).__init__()
         cvb = CustomViewBox()
@@ -71,9 +94,9 @@ class SpectrogramWidget(pqg.PlotWidget):
 
         self.img = pqg.ImageItem()
         self.addItem(self.img)
-        FS = 44100 #Hz
-        CHUNKSZ = 1024 #samples
-        self.img_array = np.zeros((1000, CHUNKSZ/2+1))
+        self.FS = 44100 #Hz
+        self.CHUNKSZ = 1024 #samples
+        self.img_array = np.zeros((1000, self.CHUNKSZ/2+1))
 
         # bipolar colormap
 
@@ -85,20 +108,20 @@ class SpectrogramWidget(pqg.PlotWidget):
         self.img.setLookupTable(lut)
         self.img.setLevels([-50,40])
 
-        freq = np.arange((CHUNKSZ/2)+1)/(float(CHUNKSZ)/FS)
+        freq = np.arange((self.CHUNKSZ/2)+1)/(float(self.CHUNKSZ)/self.FS)
         yscale = 1.0/(self.img_array.shape[1]/freq[-1])
-        self.img.scale((1./FS)*CHUNKSZ, yscale)
+        self.img.scale((1./self.FS)*self.CHUNKSZ, yscale)
 
         self.setLabel('left', 'Frequency', units='Hz')
         self.setLabel('bottom', 'Time', units='Sec.')
 
-        self.win = np.hanning(CHUNKSZ)
+        self.win = np.hanning(self.CHUNKSZ)
         self.show()
 
     def update(self, chunk):
         # normalized, windowed frequencies in data chunk
 
-        spec = np.fft.rfft(chunk*self.win) / CHUNKSZ
+        spec = np.fft.rfft(chunk*self.win) / self.CHUNKSZ
         # get magnitude
 
         psd = abs(spec)
@@ -116,7 +139,8 @@ class SpectrogramWidget(pqg.PlotWidget):
 class ComboWidget(QtGui.QWidget):
     def __init__(self):
         super(ComboWidget, self).__init__()
-
+        self.FS = 44100
+        self.CHUNKSZ = 1024
         #<嚐試使用自動載入按鈕>
         try:
             moduleLIST = [m for m in os.listdir("./toolbox") if m.endswith("Tools.py")]
@@ -133,30 +157,24 @@ class ComboWidget(QtGui.QWidget):
                 mObj = importlib.import_module("toolbox."+m.replace(".py", ""))
                 mFuncLIST = [f for f in inspect.getmembers(mObj) if inspect.ismodule(f[1])]
                 print("functions:", mFuncLIST)
-
-
-            #mObj = __import__("toolbox."+m.replace(".py", ""))
-            #current_module = sys.modules[mObj.__name__]
-            #print("modules:", current_module)
-        #print("moduleLIST:", moduleLIST)
-        #toolLIST = ["test1", "test2"]
         toolLIST = [m[:-3].upper().replace("TOOLS", " tools") for m in moduleLIST]
         toolCombobox = pqg.ComboBox(items=toolLIST)
 
 
         #</嚐試使用自動載入按鈕>
 
+
         self.hBox = QtGui.QHBoxLayout()
 
         self.vBox = QtGui.QVBoxLayout()
         waveformZone = WaveformGraph()
-        spectrogramZone = SpectrogramWidget()
+        self.spectrogramZone = SpectrogramWidget()
         self.setContentsMargins(-10, -10, -10, -5)
 
-        waveformZone.setXLink(spectrogramZone)
+        waveformZone.setXLink(self.spectrogramZone)
 
         self.vBox.addWidget(waveformZone)
-        self.vBox.addWidget(spectrogramZone)
+        self.vBox.addWidget(self.spectrogramZone)
 
         self.gBox = QtGui.QGridLayout()
         self.gBox.setAlignment(QtCore.Qt.Alignment(QtCore.Qt.AlignTop))
@@ -166,9 +184,6 @@ class ComboWidget(QtGui.QWidget):
         self.hBox.addLayout(self.vBox)
         self.hBox.addLayout(self.gBox)
 
-
-        #self.gBox.addWidget()
-
         self.setLayout(self.hBox)
-        #self.setLayout(self.vBox)
+
         return None

@@ -86,11 +86,11 @@ if __name__ == '__main__':
 
     # time (seconds) between reads
 
+
     interval = FS/CHUNKSZ
     t = pg.QtCore.QTimer()
     t.timeout.connect(mic.read)
     t.start(1000/interval) #QTimer takes ms
-
 
     app.exec_()
     mic.close()

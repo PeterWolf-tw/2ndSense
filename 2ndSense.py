@@ -15,13 +15,37 @@
 
 import os
 import sys
-
+import pyaudio
 from PySide import QtCore
 from PySide import QtGui
+import pyqtgraph as pqg
 from UI.fileManager import FileListQListWidget
 from UI.ctrlButtons import DropZoneFrame
 from UI.plotZone import ComboWidget
+import numpy as np
+#from UI import plotZone
 
+class MicrophoneRecorder():
+    def __init__(self, signal):
+        self.FS = 44100
+        self.CHUNKSZ = 1024
+        self.signal = signal
+        self.p = pyaudio.PyAudio()
+        self.stream = self.p.open(format=pyaudio.paInt16,
+                                  channels=1,
+                                  rate=self.FS,
+                                  input=True,
+                                  frames_per_buffer=self.CHUNKSZ)
+
+    def read(self):
+        data = self.stream.read(self.CHUNKSZ)
+        y = np.fromstring(data, 'int16')
+        self.signal.emit(y)
+
+    def close(self):
+        self.stream.stop_stream()
+        self.stream.close()
+        self.p.terminate()
 
 class MainWindow(QtGui.QWidget):
     def __init__(self):
@@ -70,8 +94,8 @@ class MainWindow(QtGui.QWidget):
         lowerLeftTable = FileListQListWidget()
         lowerLeftVBox.addWidget(lowerLeftTable)
 
-        comboZone = ComboWidget()
-        upperRightVBox.addWidget(comboZone)
+        self.comboZone = ComboWidget()
+        upperRightVBox.addWidget(self.comboZone)
 
         lowerRightButton = QtGui.QPushButton(lowerRightFrame)
         lowerRightButton.setText("RIGHT Lower")
@@ -96,6 +120,8 @@ class MainWindow(QtGui.QWidget):
 
         self.show()
 
+
+
         return None
 
     def dragMoveEvent(self, e):
@@ -106,9 +132,22 @@ class MainWindow(QtGui.QWidget):
             e.ignore()
 
 
+
 def main():
     app = QtGui.QApplication(sys.argv)
     window = MainWindow()
+
+    #<給筑安期末炫炮呈現使用，實際開發時需移除>
+    spz = window.comboZone.spectrogramZone
+    spz.read_collected.connect(spz.update)
+    mic = MicrophoneRecorder(spz.read_collected)
+    interval = 44100/1024
+    t = pqg.QtCore.QTimer()
+    t.timeout.connect(mic.read)
+    t.start(1000/interval) #QTimer takes ms
+    #</給筑安期末炫炮呈現使用，實際開發時需移除>
+
+
     sys.exit(app.exec_())
 
 if __name__== "__main__":

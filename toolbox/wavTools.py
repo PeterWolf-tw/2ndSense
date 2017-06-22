@@ -6,6 +6,9 @@ import numpy
 import wave
 import struct
 
+def testFunc():
+    return None
+
 class WavGear:
     def __init__(self):
         self.wavFileName = None
