@@ -21,27 +21,28 @@ import pyqtgraph as pqg
 import sys
 import numpy as np
 
-class MicrophoneRecorder():
-    def __init__(self, signal):
-        self.FS = 44100
-        self.CHUNKSZ = 1024
-        self.signal = signal
-        self.p = pyaudio.PyAudio()
-        self.stream = self.p.open(format=pyaudio.paInt16,
-                                  channels=1,
-                                  rate=self.FS,
-                                  input=True,
-                                  frames_per_buffer=self.CHUNKSZ)
+#class MicrophoneRecorder():
+    #def __init__(self, signal):
+        #self.FS = 44100
+        #self.CHUNKSZ = 1024
+        #self.signal = signal
+        #self.p = pyaudio.PyAudio()
+        #self.stream = self.p.open(format=pyaudio.paInt16,
+                                  #channels=1,
+                                  #rate=self.FS,
+                                  #input=True,
+                                  #frames_per_buffer=self.CHUNKSZ)
 
-    def read(self):
-        data = self.stream.read(CHUNKSZ)
-        y = np.fromstring(data, 'int16')
-        self.signal.emit(y)
+    #def read(self):
+        #data = self.stream.read(self.CHUNKSZ)
+        #y = np.fromstring(data, 'int16')
+        #print(self.stream)
+        #self.signal.emit(y)
 
-    def close(self):
-        self.stream.stop_stream()
-        self.stream.close()
-        self.p.terminate()
+    #def close(self):
+        #self.stream.stop_stream()
+        #self.stream.close()
+        #self.p.terminate()
 
 
 class CustomViewBox(pqg.ViewBox):
@@ -61,6 +62,7 @@ class CustomViewBox(pqg.ViewBox):
             pqg.ViewBox.mouseDragEvent(self, ev)
 
 class WaveformGraph(pqg.PlotWidget):
+    read_collected = QtCore.Signal(np.ndarray)
     def __init__(self):
         super(WaveformGraph, self).__init__()
         cvb = CustomViewBox()
@@ -69,18 +71,19 @@ class WaveformGraph(pqg.PlotWidget):
         self.setLimits(yMin=-1, yMax=1, xMin=0)
         pqg.setConfigOptions(antialias=True)
         #self.setMouseE
-        self.data = []
+        self.data = [1, 2, 3]
         self.setLabel('left', 'amp')
         self.setLabel('bottom', 'Time', units='Sec.')
         return None
 
-    def plotter(data):
+    def plotter(self, data):
         p = self.PlotItem.plot(data)
 
-    #def wheelEvent(self, axis=None):
-        ## 1. Pass on the wheelevent to the superclass, such
-        ##    that the standard zoomoperation can be executed.
-        #pqg.PlotWidget.wheelEvent(ev,axis)
+    def update(self, data):
+        #print(data)
+        self.data = np.roll(data, -1, 0)
+        print(self.data)
+        self.plot(self.data)
 
 
 class SpectrogramWidget(pqg.PlotWidget):
@@ -95,7 +98,7 @@ class SpectrogramWidget(pqg.PlotWidget):
         self.img = pqg.ImageItem()
         self.addItem(self.img)
         self.FS = 44100 #Hz
-        self.CHUNKSZ = 1024 #samples
+        self.CHUNKSZ = 1470 #samples
         self.img_array = np.zeros((1000, self.CHUNKSZ/2+1))
 
         # bipolar colormap
@@ -130,17 +133,15 @@ class SpectrogramWidget(pqg.PlotWidget):
         psd = 20 * np.log10(psd)
 
         # roll down one and replace leading edge with new data
-
         self.img_array = np.roll(self.img_array, -1, 0)
         self.img_array[-1:] = psd
-
-        self.img.setImage(self.img_array, autoLevels=False)
+        self.img.setImage(self.img_array, autoLevels=True)
 
 class ComboWidget(QtGui.QWidget):
     def __init__(self):
         super(ComboWidget, self).__init__()
         self.FS = 44100
-        self.CHUNKSZ = 1024
+        self.CHUNKSZ = 1470
         #<嚐試使用自動載入按鈕>
         try:
             moduleLIST = [m for m in os.listdir("./toolbox") if m.endswith("Tools.py")]
@@ -167,13 +168,13 @@ class ComboWidget(QtGui.QWidget):
         self.hBox = QtGui.QHBoxLayout()
 
         self.vBox = QtGui.QVBoxLayout()
-        waveformZone = WaveformGraph()
+        self.waveformZone = WaveformGraph()
         self.spectrogramZone = SpectrogramWidget()
         self.setContentsMargins(-10, -10, -10, -5)
 
-        waveformZone.setXLink(self.spectrogramZone)
+        self.waveformZone.setXLink(self.spectrogramZone)
 
-        self.vBox.addWidget(waveformZone)
+        self.vBox.addWidget(self.waveformZone)
         self.vBox.addWidget(self.spectrogramZone)
 
         self.gBox = QtGui.QGridLayout()

@@ -28,7 +28,7 @@ import numpy as np
 class MicrophoneRecorder():
     def __init__(self, signal):
         self.FS = 44100
-        self.CHUNKSZ = 1024
+        self.CHUNKSZ = 1470
         self.signal = signal
         self.p = pyaudio.PyAudio()
         self.stream = self.p.open(format=pyaudio.paInt16,
@@ -119,9 +119,6 @@ class MainWindow(QtGui.QWidget):
         #extRightFrame.setAcceptDrops(False)
 
         self.show()
-
-
-
         return None
 
     def dragMoveEvent(self, e):
@@ -137,15 +134,19 @@ def main():
     app = QtGui.QApplication(sys.argv)
     window = MainWindow()
 
-    #<給筑安期末炫炮呈現使用，實際開發時需移除>
-    spz = window.comboZone.spectrogramZone
-    spz.read_collected.connect(spz.update)
-    mic = MicrophoneRecorder(spz.read_collected)
-    interval = 44100/1024
-    t = pqg.QtCore.QTimer()
-    t.timeout.connect(mic.read)
-    t.start(1000/interval) #QTimer takes ms
-    #</給筑安期末炫炮呈現使用，實際開發時需移除>
+    ##<給筑安期末炫炮呈現使用，實際開發時需移除>
+    #spz = window.comboZone.spectrogramZone
+    #wav = window.comboZone.waveformZone
+    #spz.read_collected.connect(spz.update)
+    #wav.read_collected.connect(wav.update)
+    #spzMic = MicrophoneRecorder(spz.read_collected)
+    #wavMic = MicrophoneRecorder(wav.read_collected)
+    #interval = 44100/1470
+    #t = pqg.QtCore.QTimer()
+    #t.timeout.connect(spzMic.read)
+    #t.timeout.connect(wavMic.read)
+    #t.start(1000/interval) #QTimer takes ms
+    ##</給筑安期末炫炮呈現使用，實際開發時需移除>
 
 
     sys.exit(app.exec_())
