@@ -19,9 +19,9 @@ import pyaudio
 from PySide import QtCore
 from PySide import QtGui
 import pyqtgraph as pqg
-from UI.fileManager import FileListQListWidget
-from UI.ctrlButtons import DropZoneFrame
-from UI.plotZone import ComboWidget
+from lib.UI.fileManager import FileListQListWidget
+from lib.UI.ctrlButtons import DropZoneFrame
+from lib.UI.plotZone import ComboWidget
 import numpy as np
 #from UI import plotZone
 
